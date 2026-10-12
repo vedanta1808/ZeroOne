@@ -1,0 +1,614 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GestureLink | Gesture Control System</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f7fb;
+            color: #172033;
+        }
+
+        header {
+            background: #14213d;
+            color: white;
+            padding: 22px 7%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .brand {
+            font-size: 27px;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        .brand span {
+            color: #52d6a1;
+        }
+
+        .subtitle {
+            color: #cbd5e1;
+            font-size: 13px;
+            margin-top: 5px;
+        }
+
+        .header-status {
+            font-size: 13px;
+            background: #243653;
+            padding: 10px 14px;
+            border-radius: 20px;
+        }
+
+        .dot {
+            display: inline-block;
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            margin-right: 7px;
+            background: #f59e0b;
+        }
+
+        main {
+            width: min(1200px, 92%);
+            margin: 30px auto;
+        }
+
+        .welcome {
+            margin-bottom: 24px;
+        }
+
+        .welcome h1 {
+            font-size: clamp(25px, 4vw, 34px);
+            margin-bottom: 8px;
+        }
+
+        .welcome p {
+            color: #64748b;
+            line-height: 1.6;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: minmax(0, 1.5fr) minmax(260px, 0.8fr);
+            gap: 22px;
+            align-items: start;
+        }
+
+        .card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 22px;
+            box-shadow: 0 5px 20px rgba(15, 23, 42, 0.04);
+        }
+
+        .card h2 {
+            font-size: 19px;
+            margin-bottom: 8px;
+        }
+
+        .description {
+            color: #64748b;
+            font-size: 13px;
+            line-height: 1.5;
+            margin-bottom: 18px;
+        }
+
+        .camera-container {
+            background: #0b1220;
+            border-radius: 12px;
+            overflow: hidden;
+            min-height: 220px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #gesture-camera {
+            width: 100%;
+            height: auto;
+            display: block;
+            object-fit: contain;
+        }
+
+        .camera-placeholder {
+            color: #cbd5e1;
+            text-align: center;
+            padding: 30px 15px;
+            line-height: 1.8;
+        }
+
+        .camera-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 16px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            border: none;
+            border-radius: 9px;
+            padding: 12px 18px;
+            font-weight: bold;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .primary {
+            background: #1769e0;
+            color: white;
+        }
+
+        .secondary {
+            background: #e8eef7;
+            color: #172033;
+        }
+
+        .hint {
+            font-size: 12px;
+            color: #64748b;
+            margin-top: 12px;
+            line-height: 1.5;
+        }
+
+        .status-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 18px;
+        }
+
+        .status-box {
+            padding: 15px;
+            border-radius: 11px;
+            background: #f5f8fc;
+            border: 1px solid #e8edf5;
+            min-width: 0;
+        }
+
+        .status-label {
+            font-size: 12px;
+            color: #64748b;
+            margin-bottom: 9px;
+        }
+
+        .status-value {
+            font-size: 15px;
+            font-weight: bold;
+            overflow-wrap: anywhere;
+        }
+
+        .gesture-card {
+            background: #eef5ff;
+            border: 1px solid #dbeafe;
+            padding: 20px;
+            border-radius: 12px;
+            margin: 18px 0;
+        }
+
+        .gesture-name {
+            color: #1769e0;
+            font-size: 23px;
+            font-weight: bold;
+            margin: 8px 0;
+            overflow-wrap: anywhere;
+        }
+
+        .action-name {
+            font-size: 16px;
+            font-weight: bold;
+            line-height: 1.5;
+            overflow-wrap: anywhere;
+        }
+
+        .emergency {
+            display: none;
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+            border-radius: 10px;
+            padding: 14px;
+            font-weight: bold;
+            margin-top: 16px;
+        }
+
+        .emergency.visible {
+            display: block;
+        }
+
+        .legend {
+            margin-top: 22px;
+        }
+
+        .legend h3 {
+            font-size: 16px;
+            margin-bottom: 12px;
+        }
+
+        .gesture-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 12px 0;
+            border-bottom: 1px solid #edf0f5;
+            font-size: 13px;
+        }
+
+        .gesture-row:last-child {
+            border-bottom: none;
+        }
+
+        .gesture-row span:first-child {
+            color: #64748b;
+        }
+
+        .connection-good {
+            color: #15803d;
+        }
+
+        .connection-bad {
+            color: #b91c1c;
+        }
+
+        .connection-wait {
+            color: #b45309;
+        }
+
+        footer {
+            text-align: center;
+            padding: 25px 15px;
+            color: #64748b;
+            font-size: 12px;
+        }
+
+        @media (max-width: 760px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+
+            header {
+                padding: 20px 5%;
+            }
+
+            main {
+                width: 94%;
+                margin-top: 20px;
+            }
+
+            .card {
+                padding: 17px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div>
+            <div class="brand">Gesture<span>Link</span></div>
+            <div class="subtitle">Hand Gesture Recognition & IoT Control</div>
+        </div>
+
+        <div class="header-status">
+            <span class="dot" id="program-dot"></span>
+            <span id="program-status">Connecting to system...</span>
+        </div>
+    </header>
+
+    <main>
+        <section class="welcome">
+            <h1>Gesture Control Dashboard</h1>
+            <p>
+                Control your connected ESP32 system using hand gestures.
+                View your camera and monitor system status in real time.
+            </p>
+        </section>
+
+        <div class="dashboard">
+            <!-- CAMERA PANEL -->
+            <section class="card">
+                <h2>Live Camera</h2>
+                <p class="description">
+                    Your detected hand, gesture label and landmarks
+                    will appear in this feed.
+                </p>
+
+                <div class="camera-container">
+                    <div class="camera-placeholder" id="camera-placeholder">
+                        <div>Camera feed is waiting for the gesture controller.</div>
+                        <div>Start your Python gesture program to begin.</div>
+                    </div>
+
+                    <img
+                        id="gesture-camera"
+                        src=""
+                        alt="Live hand gesture camera"
+                        hidden
+                    >
+                </div>
+
+                <div class="camera-actions">
+                    <button class="primary" id="start-camera">
+                        Show Camera
+                    </button>
+
+                    <button class="secondary" id="stop-camera">
+                        Hide Camera
+                    </button>
+                </div>
+
+                <p class="hint" id="camera-message" aria-live="polite">
+                    The camera is managed by gesture_esp32.py.
+                    Show Camera displays its stream here.
+                </p>
+
+                <div class="status-grid">
+                    <div class="status-box">
+                        <div class="status-label">Gesture Program</div>
+                        <div class="status-value connection-wait" id="program-card">
+                            Connecting...
+                        </div>
+                    </div>
+
+                    <div class="status-box">
+                        <div class="status-label">ESP32 Serial</div>
+                        <div class="status-value connection-wait" id="serial-status">
+                            Checking...
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- GESTURE STATUS PANEL -->
+            <section class="card">
+                <h2>Gesture Status</h2>
+                <p class="description">
+                    Live information received from your Python controller.
+                </p>
+
+                <div class="gesture-card">
+                    <div class="status-label">CURRENT GESTURE</div>
+                    <div class="gesture-name" id="gesture-name">None</div>
+
+                    <div class="status-label">ASSIGNED ACTION</div>
+                    <div class="action-name" id="action-name">
+                        Waiting for gesture
+                    </div>
+                </div>
+
+                <div class="status-grid">
+                    <div class="status-box">
+                        <div class="status-label">Action Countdown</div>
+                        <div class="status-value" id="countdown">--</div>
+                    </div>
+
+                    <div class="status-box">
+                        <div class="status-label">Emergency State</div>
+                        <div class="status-value" id="emergency-status">
+                            Inactive
+                        </div>
+                    </div>
+                </div>
+
+                <div class="emergency" id="emergency-alert" role="alert">
+                    EMERGENCY STOP ACTIVATED
+                </div>
+
+                <div class="legend">
+                    <h3>Gesture Commands</h3>
+
+                    <div class="gesture-row">
+                        <span>Thumbs Up</span>
+                        <strong>Move Forward</strong>
+                    </div>
+
+                    <div class="gesture-row">
+                        <span>Point Left</span>
+                        <strong>Turn Left</strong>
+                    </div>
+
+                    <div class="gesture-row">
+                        <span>Point Right</span>
+                        <strong>Turn Right</strong>
+                    </div>
+
+                    <div class="gesture-row">
+                        <span>Peace Sign</span>
+                        <strong>Reverse Mode</strong>
+                    </div>
+
+                    <div class="gesture-row">
+                        <span>Three Fingers</span>
+                        <strong>Normal Stop</strong>
+                    </div>
+
+                    <div class="gesture-row">
+                        <span>Open Palm</span>
+                        <strong>Emergency Stop</strong>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <footer>
+        GestureLink · Python · MediaPipe · Flask · ESP32
+    </footer>
+
+    <script>
+        const camera = document.getElementById("gesture-camera");
+        const placeholder = document.getElementById("camera-placeholder");
+        const cameraMessage = document.getElementById("camera-message");
+
+        const startButton = document.getElementById("start-camera");
+        const stopButton = document.getElementById("stop-camera");
+
+        let cameraVisible = false;
+        let lastStatusReceived = 0;
+
+        function showCamera() {
+            cameraVisible = true;
+
+            placeholder.hidden = true;
+            camera.hidden = false;
+
+            // Add a timestamp to request a fresh stream.
+            camera.src = "/video_feed?t=" + Date.now();
+
+            cameraMessage.textContent =
+                "Connecting to the camera stream...";
+
+            startButton.disabled = true;
+            stopButton.disabled = false;
+        }
+
+        function hideCamera() {
+            cameraVisible = false;
+
+            camera.removeAttribute("src");
+            camera.hidden = true;
+            placeholder.hidden = false;
+
+            cameraMessage.textContent =
+                "Camera feed hidden. Gesture processing may continue in Python.";
+
+            startButton.disabled = false;
+            stopButton.disabled = true;
+        }
+
+        camera.addEventListener("load", () => {
+            if (cameraVisible) {
+                cameraMessage.textContent =
+                    "Live camera stream displayed.";
+            }
+        });
+
+        camera.addEventListener("error", () => {
+            if (cameraVisible) {
+                cameraMessage.textContent =
+                    "Camera stream unavailable. Check that web_server.py and gesture_esp32.py are running.";
+                camera.hidden = true;
+                placeholder.hidden = false;
+                startButton.disabled = false;
+                stopButton.disabled = true;
+                cameraVisible = false;
+            }
+        });
+
+        startButton.addEventListener("click", showCamera);
+        stopButton.addEventListener("click", hideCamera);
+
+        stopButton.disabled = true;
+
+        async function updateStatus() {
+            try {
+                const response = await fetch("/api/status", {
+                    cache: "no-store"
+                });
+
+                if (!response.ok) {
+                    throw new Error("Status request failed");
+                }
+
+                const data = await response.json();
+                lastStatusReceived = Date.now();
+
+                const connected = Boolean(data.program_connected);
+                const serialConnected = Boolean(data.serial_connected);
+
+                document.getElementById("program-status").textContent =
+                    connected ? "Gesture Program Connected" : "Program Offline";
+
+                document.getElementById("program-dot").style.background =
+                    connected ? "#52d6a1" : "#ef4444";
+
+                setConnection(
+                    "program-card",
+                    connected,
+                    connected ? "Connected" : "Offline"
+                );
+
+                setConnection(
+                    "serial-status",
+                    serialConnected,
+                    serialConnected ? "Connected" : "Disconnected"
+                );
+
+                document.getElementById("gesture-name").textContent =
+                    data.gesture || "None";
+
+                document.getElementById("action-name").textContent =
+                    data.action || "Waiting for gesture";
+
+                const emergency = Boolean(data.emergency);
+
+                document.getElementById("emergency-status").textContent =
+                    emergency ? "ACTIVE" : "Inactive";
+
+                document.getElementById("emergency-status").className =
+                    "status-value " +
+                    (emergency ? "connection-bad" : "connection-good");
+
+                document.getElementById("emergency-alert").classList.toggle(
+                    "visible",
+                    emergency
+                );
+
+                const pendingUntil = Number(data.pending_until || 0);
+                const remaining = pendingUntil - Date.now() / 1000;
+
+                document.getElementById("countdown").textContent =
+                    remaining > 0
+                        ? Math.ceil(remaining) + " seconds"
+                        : "No pending action";
+
+            } catch (error) {
+                document.getElementById("program-status").textContent =
+                    "Server unavailable";
+
+                document.getElementById("program-dot").style.background =
+                    "#ef4444";
+
+                setConnection("program-card", false, "Offline");
+
+                document.getElementById("serial-status").textContent =
+                    "Unknown";
+
+                document.getElementById("serial-status").className =
+                    "status-value connection-wait";
+            }
+        }
+
+        function setConnection(id, connected, label) {
+            const element = document.getElementById(id);
+
+            element.textContent = label;
+            element.className =
+                "status-value " +
+                (connected ? "connection-good" : "connection-bad");
+        }
+
+        updateStatus();
+        setInterval(updateStatus, 500);
+    </script>
+</body>
+</html>
